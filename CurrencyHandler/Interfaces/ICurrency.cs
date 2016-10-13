@@ -5,9 +5,9 @@ using System.Text;
 
 namespace CurrencyHandler.Interfaces {
     public interface ICurrency {
-        bool Negativity { get; set; }
+        bool? Negativity { get; set; }
         string Currency { get; set; }
-        string WholeValue { get; set; }
-        string DecimalValue { get; set; }
+        int? WholeValue { get; set; }
+        int? DecimalValue { get; set; }
     }
 }

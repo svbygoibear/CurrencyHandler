@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CurrencyHandler.Interfaces;
+using CurrencyHandler.Helpers;
 
 namespace CurrencyHandler {
     public class RealMoney : ICurrency {
         #region fields
-        private bool negativity;
+        private bool? negativity;
         private string currency;
-        private string wholeValue;
-        private string decimalValue;
-        private Dictionary<string, string> curr = new Dictionary<string, string> { { "R", "rand" } };
-        private Dictionary<int, string> specialNames = new Dictionary<int, string> { { 3, "hundred" }, { 5, "thousand" } };
-        private Dictionary<int, string> tenNames = new Dictionary<int, string> { { 1, "ten" }, { 2, "twenty" }, { 3, "thirty"}, { 4, "fourty"}, { 5, "fifty"}, { 6, "sixty"}, { 7, "seventy"}, { 8, "eighty"}, { 9, "ninety"} };
-        private Dictionary<int, string> numNames = new Dictionary<int, string> { { 1, "zero" }, { 2, "two" }, { 3, "three" }, { 4, "four" }, { 5, "five" }, { 6, "six" }, { 7, "seven" }, { 8, "eight" }, { 9, "nine" } };
+        private int? wholeValue;
+        private int? decimalValue;
+        private string wordValue;
         #endregion fields
 
         #region properties
-        public bool Negativity {
+        public bool? Negativity {
             get { return negativity; }
             set { negativity = value; }
         }
@@ -28,89 +26,59 @@ namespace CurrencyHandler {
             set { currency = value; }
         }
 
-        public string WholeValue {
+        public int? WholeValue {
             get { return wholeValue; }
             set { wholeValue = value; }
         }
 
-        public string DecimalValue {
+        public int? DecimalValue {
             get { return decimalValue; }
             set { decimalValue = value; }
+        }
+
+        public string WordValue {
+            get { return wordValue; }
+            //set { wordValue = value; }
         }
         #endregion
 
         #region constructors
         public RealMoney() { }
 
-        public RealMoney(bool negativity, string currency, string wholeValue, string decimalValue) {
+        public RealMoney(bool? negativity, string currency, int? wholeValue, int? decimalValue) {
             this.Negativity = negativity;
             this.Currency = currency;
             this.WholeValue = wholeValue;
             this.DecimalValue = decimalValue;
+            this.wordValue = toWord(); // generates the to word value
         }
         #endregion constructorsconstructors
 
         #region public methods
-        /// <summary>
-        /// Converts this instance of a RealMoney object to a word value
-        /// </summary>
-        /// <returns>Returns the word value of the money</returns>
-        public string ToWordValue() {
-            var res = "";
+        private string toWord() {
+            var result = "";
+            if (!this.wholeValue.HasValue && !this.decimalValue.HasValue)
+                result += "Error (empty string)";
+            else if (!this.wholeValue.HasValue)
+                result += "Error (invalid rand value)";
+            else if (!this.decimalValue.HasValue)
+                result += "Error (invalid cents values)";
+            else {
+                var randValue = this.wholeValue.Value.NumbersToWords();
+                var centValue = this.decimalValue.Value.NumbersToWords();
 
-            if (this.negativity)
-                res += "minus";
+                result += !this.wholeValue.HasValue ? "" : this.negativity.Value ? "Minus " : "";
+                result += randValue + " rand";
+                result += this.currency.getCurrency() == "" ? "R" : $" {this.currency.getCurrency()} ";
+                result += centValue + (this.decimalValue == 1 ?" cent" : " cents");
+            }
 
-            res += this.wholeValue != null ? numericToWord(this.wholeValue, false) : "";
-            res += this.currency != "" ? curr[(this.currency.ToLower()).ToString()] : ""; // adds converted currency from pre-defined source
-            res += this.decimalValue != null ? numericToWord(this.decimalValue, true) + " cents " : "";
-
-            return res;
+            return result;
         }
 
         public override string ToString() {
-            return string.Format("Value: {0}", ToWordValue()); 
+            return string.Format("Value: {0}", this.wholeValue); 
         }
         #endregion public methods
-
-        private string numericToWord(string numericalValue, bool isCent) {
-            var res = "";
-            var charr = numericalValue.ToCharArray().ToList();
-
-            if(isCent == false)  //whole number
-                res = wholeConversion(charr);
-            else //cent
-                res = centConversion(charr);
-
-            return res;
-        }
-
-        private string wholeConversion(List<char> charr) {
-            var res = "";
-            for (int i = charr.Count; i != 0; i--) {
-                if(i == 5)
-                    res += tenNames[i] + numNames[charr[i]] + specialNames[i];
-                else if(i == 4 && charr.Count == 4)
-                    res += numNames[charr[i]] + specialNames[i];
-                else if (i == 3)
-                    res += numNames[charr[i]] + specialNames[i];
-                else if (i == 2)
-                    res += charr[i] == '0' ? "zero" : numNames[charr[i]] + tenNames[i];
-                else if (i == 1)
-                    res += numNames[charr[i]];
-            }
-            return res;
-        }
-
-        private string centConversion(List<char> charr) {
-            var res = "";
-            for (int i = charr.Count; i != 0; i--) {
-                if (i == 2)
-                    res += charr[i] == '0' ? "zero" : numNames[charr[i]] + tenNames[i];
-                else if (i == 1)
-                    res += numNames[charr[i]];
-            }
-            return res;
-        }
     }
 }
