@@ -22,9 +22,43 @@ namespace CurrencyHandler.Helpers {
         /// <param name="value">String item to be converted</param>
         /// <returns>RealMoney object</returns>
         public static RealMoney StringToRealMoney(this string value) {
-            var res = new RealMoney();
+            var negativity = false;
+            var curr = "";
+            int? centValue = null;
+            int? randValue = null;
 
-            return res;
+            if(value.Substring(0) == "-") { // Returns negativity value
+                negativity = true;
+                value.Remove(1);
+            }
+
+            if (currency.Keys.Contains(value.Substring(0))) { // Returns possible currency
+                curr = value.Substring(0);
+                value.Remove(1).Replace(" ", "");
+            }
+
+            var split = value.IndexOf('.');
+            if (split < 0) {
+                if (isNumber(value))
+                    randValue = int.Parse(value);
+            }
+            else {
+                var rand = value.Substring(0, split - 1);
+                var cent = value.Substring(split + 1);
+
+                if (isNumber(rand))
+                    randValue = int.Parse(rand);
+
+                if (isNumber(cent))
+                    centValue = int.Parse(cent);
+            }
+
+            return new RealMoney(negativity, curr, randValue, centValue);
+        }
+
+        public static bool isNumber(string value) {
+            int i;
+            return int.TryParse(value, out i);
         }
 
         public static string getCurrency(this string s) {
