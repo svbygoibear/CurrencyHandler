@@ -9,7 +9,6 @@ Write a class that implements method(s) to convert a monetary amount into its wo
 
 The following are possible results which can be expected::
 
-```
 | Input | Output |
 |--------|--------|
 |    R 0    |    zero rand    |
@@ -22,7 +21,6 @@ The following are possible results which can be expected::
 |    100.0x    |    Error (invalid cents values)    |
 |        |    Error (empty string)    |
 |    1000    |    Error (rand value out of range)    |
-```
 
 ###Deductions
 From the instructions given, the following assumptions can be deducted from it:
