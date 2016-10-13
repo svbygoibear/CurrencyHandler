@@ -50,7 +50,7 @@ namespace CurrencyHandler.Helpers {
                     randValue = int.Parse(rand);
 
                 if (isNumber(cent))
-                    centValue = int.Parse(cent);
+                    centValue = int.Parse(cent.Substring(0, 2));
             }
 
             return new RealMoney(negativity, curr, randValue, centValue);
