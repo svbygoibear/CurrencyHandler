@@ -8,7 +8,7 @@ using CurrencyHandler.Helpers;
 namespace CurrencyHandler {
     public class RealMoney : ICurrency {
         #region fields
-        private bool? negativity;
+        private bool negativity;
         private string currency;
         private int? wholeValue;
         private int? decimalValue;
@@ -16,7 +16,7 @@ namespace CurrencyHandler {
         #endregion fields
 
         #region properties
-        public bool? Negativity {
+        public bool Negativity {
             get { return negativity; }
             set { negativity = value; }
         }
@@ -45,7 +45,7 @@ namespace CurrencyHandler {
         #region constructors
         public RealMoney() { }
 
-        public RealMoney(bool? negativity, string currency, int? wholeValue, int? decimalValue) {
+        public RealMoney(bool negativity, string currency, int? wholeValue, int? decimalValue) {
             this.Negativity = negativity;
             this.Currency = currency;
             this.WholeValue = wholeValue;
@@ -55,6 +55,16 @@ namespace CurrencyHandler {
         #endregion constructorsconstructors
 
         #region public methods
+        public override string ToString() {
+            return string.Format("Value: {0}", this.wholeValue); 
+        }
+        #endregion public methods
+
+        #region private methods
+        /// <summary>
+        /// Generates a to word value for the current real money object
+        /// </summary>
+        /// <returns>To Word value in string</returns>
         private string toWord() {
             var result = "";
             if (!this.wholeValue.HasValue && !this.decimalValue.HasValue)
@@ -67,18 +77,14 @@ namespace CurrencyHandler {
                 var randValue = this.wholeValue.Value.NumbersToWords();
                 var centValue = this.decimalValue.Value.NumbersToWords();
 
-                result += !this.wholeValue.HasValue ? "" : this.negativity.Value ? "Minus " : "";
-                result += randValue + " rand";
-                result += this.currency.getCurrency() == "" ? "R" : $" {this.currency.getCurrency()} ";
-                result += centValue + (this.decimalValue == 1 ?" cent" : " cents");
+                result += (this.negativity ? "Minus " : "") // Negativity indictor
+                    + (randValue) // Rand value
+                    + (this.currency.getCurrency() == "" ? "R" : $" {this.currency.getCurrency()} ") // Currency
+                    + ("and " + centValue + (this.decimalValue == 1 ? " Cent" : " Cents")); // Cent value
             }
 
             return result;
         }
-
-        public override string ToString() {
-            return string.Format("Value: {0}", this.wholeValue); 
-        }
-        #endregion public methods
+        #endregion private methods
     }
 }
