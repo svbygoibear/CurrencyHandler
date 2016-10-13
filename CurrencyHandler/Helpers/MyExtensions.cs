@@ -11,7 +11,7 @@ namespace CurrencyHandler.Helpers {
         static string[] doubleDigit = new string[] { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen" };
         static string[] tens = new string[] { "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" };
         static string[] specialName = { "", " Thousand", " Million", " Billion" };
-        static Dictionary<string, string> currency = new Dictionary<string, string> { {"R","rand"}, { "$", "dollar"} };
+        static Dictionary<string, string> currency = new Dictionary<string, string> { {"R","Rand"}, { "$", "Dollar"} };
 
         /// <summary>
         /// This method is used to convert string values into real money objects
@@ -32,12 +32,12 @@ namespace CurrencyHandler.Helpers {
         }
 
         private static string numbersToWords(this int number, string friendlyName) {
-            var result = "";
-            friendlyName += number < 10 ? singleDigits[number] : // If less than 10, only perform 1 iteration and get the single digit value.
-                number < 20 ? doubleDigit[number - 10] : // Return the double digit value if under 20.
-                number < 100 ? (number % 100).numbersToWords(tens[number/ 10 - 2]): // If under 100, get tens value and iterate again.
-                "";
-            return result;
+            friendlyName += number < 10 ? " " + singleDigits[number] : // If less than 10, only perform 1 iteration and get the single digit value.
+                number < 20 ? " " + doubleDigit[number - 10] : // Return the double digit value if under 20.
+                number < 100 ? " " + (number % 10).numbersToWords(tens[number/ 10 - 2]): // If under 100, get tens value and iterate again.
+                number < 1000 ? " " + (number % 100).numbersToWords(singleDigits[number / 100] + " Hundred" + ((number / 100) > 0 ? " and" : "")) : //generates the hundred value range
+                "Error (number value out of range)"; // error message when it is out of range
+            return friendlyName.Trim(' ');
         }
     }
 }
